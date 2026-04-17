@@ -1,101 +1,127 @@
-import Image from "next/image";
+import { db } from '@/lib/db';
+import { trips, photos } from '@/lib/db/schema';
+import { eq, count, countDistinct, min, max } from 'drizzle-orm';
+import TripCard from '@/components/TripCard';
 
-export default function Home() {
+async function getStats() {
+  const [tripStats] = await db
+    .select({
+      tripCount: count(trips.id),
+      countryCount: countDistinct(trips.country),
+      minYear: min(trips.year),
+      maxYear: max(trips.year),
+    })
+    .from(trips)
+    .where(eq(trips.published, true));
+
+  const [photoStats] = await db
+    .select({ photoCount: count(photos.id) })
+    .from(photos)
+    .innerJoin(trips, eq(photos.tripId, trips.id))
+    .where(eq(trips.published, true));
+
+  const yearRange =
+    tripStats.minYear === tripStats.maxYear
+      ? String(tripStats.minYear ?? '—')
+      : `${tripStats.minYear ?? '—'}–${tripStats.maxYear ?? '—'}`;
+
+  return {
+    tripCount: tripStats.tripCount,
+    countryCount: tripStats.countryCount,
+    photoCount: photoStats.photoCount,
+    yearRange,
+  };
+}
+
+async function getTrips() {
+  return db.query.trips.findMany({
+    where: eq(trips.published, true),
+    orderBy: (t, { desc }) => [desc(t.year)],
+    with: { photos: true },
+  });
+}
+
+function Stat({ value, label }: { value: number | string; label: string }) {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div>
+      <p className="font-playfair text-4xl md:text-5xl text-accent leading-none tabular-nums">
+        {value}
+      </p>
+      <p className="text-xs uppercase tracking-[0.2em] text-muted mt-2 font-lato">
+        {label}
+      </p>
     </div>
+  );
+}
+
+export default async function HomePage() {
+  const [stats, allTrips] = await Promise.all([getStats(), getTrips()]);
+
+  return (
+    <main>
+      {/* ── Hero ── */}
+      <section className="bg-sand px-6 py-24 md:py-36">
+        <div className="max-w-5xl mx-auto">
+          <p className="font-lato text-xs uppercase tracking-[0.35em] text-muted">
+            A Personal Travel Journal
+          </p>
+
+          <h1 className="font-playfair text-[clamp(3.5rem,10vw,7.5rem)] text-ink leading-[1.02] mt-5">
+            Our<br />
+            Wanderings
+          </h1>
+
+          <p className="font-lato text-lg md:text-xl text-muted mt-6 max-w-md">
+            Every journey, remembered. Places collected, stories kept.
+          </p>
+
+          {/* Stats row */}
+          <div className="mt-14 pt-10 border-t border-muted/25 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-0 sm:divide-x sm:divide-muted/25">
+            <div className="sm:pr-10">
+              <Stat value={stats.tripCount} label="Trips" />
+            </div>
+            <div className="sm:px-10">
+              <Stat value={stats.countryCount} label="Countries" />
+            </div>
+            <div className="sm:px-10">
+              <Stat value={stats.photoCount} label="Photos" />
+            </div>
+            <div className="sm:pl-10">
+              <Stat value={stats.yearRange} label="Explored" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Trip grid ── */}
+      <section className="bg-pale px-6 py-16 md:py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-baseline justify-between mb-10">
+            <h2 className="font-playfair text-3xl md:text-4xl text-ink">
+              All Journeys
+            </h2>
+            <p className="font-lato text-sm text-muted hidden sm:block">
+              {allTrips.length} trip{allTrips.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {allTrips.length === 0 ? (
+            <p className="font-lato text-muted text-center py-20">
+              No trips published yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-start">
+              {allTrips.map((trip) => (
+                <TripCard
+                  key={trip.id}
+                  trip={trip}
+                  photoCount={trip.photos.length}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
   );
 }

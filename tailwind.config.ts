@@ -8,12 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        playfair: ['var(--font-playfair)', 'Playfair Display', 'serif'],
+        lato: ['var(--font-lato)', 'Lato', 'sans-serif'],
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        sand: '#F5EFE0',
+        ink: '#1C1A14',
+        muted: '#7A6F5A',
+        accent: '#C0714A',
+        accent2: '#4A7B8C',
+        pale: '#EDE8DA',
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 };
 export default config;
