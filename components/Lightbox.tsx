@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { optimizedImageUrl } from '@/lib/utils';
 
 type LightboxPhoto = {
   url: string;
@@ -52,7 +53,7 @@ export default function Lightbox({ photos, index, onClose, onNext, onPrev }: Pro
       >
         <div className="relative w-full aspect-[4/3]">
           <Image
-            src={photo.url}
+            src={optimizedImageUrl(photo.url, 2000)}
             alt={photo.caption ?? ''}
             fill
             sizes="(max-width: 768px) 100vw, 80vw"

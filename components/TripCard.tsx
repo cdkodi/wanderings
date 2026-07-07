@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Trip } from '@/lib/db/schema';
+import { optimizedImageUrl } from '@/lib/utils';
 
 type Props = {
   trip: Trip;
@@ -30,7 +31,7 @@ export default function TripCard({ trip, photoCount }: Props) {
         <div className="relative aspect-[4/3] bg-pale overflow-hidden shrink-0">
           {trip.coverImageUrl ? (
             <Image
-              src={trip.coverImageUrl}
+              src={optimizedImageUrl(trip.coverImageUrl, 800)}
               alt={trip.title}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { Photo } from '@/lib/db/schema';
+import { optimizedImageUrl } from '@/lib/utils';
 import Lightbox from './Lightbox';
 
 export default function PhotoStrip({ photos }: { photos: Photo[] }) {
@@ -23,7 +24,7 @@ export default function PhotoStrip({ photos }: { photos: Photo[] }) {
           >
             {photo.url ? (
               <Image
-                src={photo.url}
+                src={optimizedImageUrl(photo.url, 800)}
                 alt={photo.caption ?? ''}
                 fill
                 sizes="288px"

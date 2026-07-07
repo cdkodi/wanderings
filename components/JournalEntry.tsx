@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Trip } from '@/lib/db/schema';
+import { optimizedImageUrl } from '@/lib/utils';
 
 interface Props {
   trip: Trip & { photoCount: number };
@@ -36,7 +37,7 @@ export default function JournalEntry({ trip }: Props) {
             <Link href={`/trips/${trip.slug}`} className="shrink-0 hidden sm:block">
               <div className="relative w-24 h-16 md:w-32 md:h-20 rounded-lg overflow-hidden bg-pale">
                 <Image
-                  src={trip.coverImageUrl}
+                  src={optimizedImageUrl(trip.coverImageUrl, 400)}
                   alt={trip.title}
                   fill
                   sizes="128px"

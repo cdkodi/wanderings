@@ -249,6 +249,8 @@ Photos use Cloudinary's built-in sample images (e.g. `samples/landscapes/nature-
 - Client-side upload will use the Cloudinary Upload Widget in `PhotoUploader.tsx` (Phase 3).
 - After upload, widget returns `{ public_id, secure_url }` — POST to `/api/photos`.
 - `next/image` used everywhere for Cloudinary URLs. `res.cloudinary.com` already in `next.config.mjs` remote patterns.
+- **Delivery optimization:** never render a stored photo/cover URL raw — wrap it in `optimizedImageUrl(url, width)` from `lib/utils.ts`, which inserts `f_auto,q_auto,c_limit,w_<width>` so Cloudinary serves AVIF/WebP at the right size. Widths in use: 400 (gallery grid, journal thumbnail), 800 (photo strip, trip card), 2000 (lightbox, trip hero).
+- **Upload pipeline for real photos:** export from Apple Photos as JPEG, long edge 2560px → upload via `/admin/photos` widget. The `wanderings_uploads` preset should have incoming transformation `c_limit,w_2560,q_auto:good` as a safety net against full-res uploads.
 
 ### Slugs
 - Slugs are auto-generated on trip save using `slugify()` from `lib/utils.ts`.

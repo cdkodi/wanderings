@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { optimizedImageUrl } from '@/lib/utils';
 import Lightbox from './Lightbox';
 
 export type GalleryPhoto = {
@@ -83,7 +84,7 @@ export default function GalleryGrid({ groups }: Props) {
                 >
                   {photo.url && (
                     <Image
-                      src={photo.url}
+                      src={optimizedImageUrl(photo.url, 400)}
                       alt={photo.caption ?? photo.tripTitle}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"

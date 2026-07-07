@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import { trips } from '@/lib/db/schema';
+import { optimizedImageUrl } from '@/lib/utils';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import PhotoStrip from '@/components/PhotoStrip';
 
@@ -46,7 +47,7 @@ export default async function TripDetailPage({ params }: Props) {
       <section className="relative w-full aspect-[16/7] bg-pale overflow-hidden">
         {trip.coverImageUrl ? (
           <Image
-            src={trip.coverImageUrl}
+            src={optimizedImageUrl(trip.coverImageUrl, 2000)}
             alt={trip.title}
             fill
             priority
