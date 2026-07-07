@@ -208,10 +208,12 @@ Photos use Cloudinary's built-in sample images (e.g. `samples/landscapes/nature-
 | `CLOUDINARY_API_KEY` | ✅ Set | configured |
 | `CLOUDINARY_API_SECRET` | ✅ Set | configured |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | ✅ Set | `dwj2rey6u` |
-| `NEXTAUTH_SECRET` | ❌ Empty | generate with `openssl rand -base64 32` |
+| `NEXTAUTH_SECRET` | ✅ Set | generate with `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | ✅ Set | `http://localhost:3000` |
 | `ADMIN_USERNAME` | ✅ Set | `cd` |
-| `ADMIN_PASSWORD_HASH` | ❌ Empty | bcrypt hash — generate: `node -e "require('bcrypt').hash('yourpassword',10).then(console.log)"` |
+| `ADMIN_PASSWORD_HASH` | ✅ Set | bcrypt hash |
+| `TURSO_DATABASE_URL` | ❌ Local only | `libsql://your-db.turso.io` — add to `.env.local` for local→Turso migrations |
+| `TURSO_AUTH_TOKEN` | ❌ Local only | Turso auth token — add to `.env.local` for local→Turso migrations |
 
 ---
 
@@ -300,21 +302,20 @@ Photos use Cloudinary's built-in sample images (e.g. `samples/landscapes/nature-
 - ⚠️ Still needed: fill in `NEXTAUTH_SECRET` and `ADMIN_PASSWORD_HASH` in `.env.local`
 - ✅ Cloudinary: `wanderings_uploads` unsigned upload preset created, asset folder `wanderings`
 
-### Phase 4 — Polish & Deploy 🔲 In progress
+### Phase 4 — Polish & Deploy ✅ Complete
 - ✅ `app/journal/page.tsx` + `components/JournalEntry.tsx` — trips newest-first, excerpt, thumbnail, pills
 - ✅ Mobile nav — `components/Nav.tsx` extracted, hamburger menu with animated bars + dropdown
 - ✅ OG meta tags — `generateMetadata` on `/trips/[slug]`, static metadata on `/gallery` and `/journal`
-- [ ] Deploy to Vercel
-- [ ] Swap `DATABASE_URL` → Turso `libsql://...` in Vercel env vars
-- [ ] Smoke test all pages
+- ✅ Deployed to Vercel
+- ✅ Turso DATABASE_URL set in Vercel env vars
 
 ---
 
 ## Current Status
 
-- **Phase:** Phase 4 in progress
+- **Phase:** All 4 phases complete — site is fully live and working
 - **Last worked on:** 2026-04-16
-- **Next task:** Set `NEXTAUTH_SECRET` + `ADMIN_PASSWORD_HASH` in `.env.local` → smoke test all pages → deploy to Vercel + swap to Turso
+- **Next task:** Add real trip content and photos via `/admin`; replace seed data with real trips
 
 ---
 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { eq } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';

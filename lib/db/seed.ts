@@ -1,14 +1,10 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { db } from './index';
 import { trips, stays, activities, photos } from './schema';
 
 const CLOUD = 'dwj2rey6u';
 function cdnUrl(publicId: string) {
   return `https://res.cloudinary.com/${CLOUD}/image/upload/${publicId}`;
 }
-
-const sqlite = new Database('./wanderings.db');
-const db = drizzle(sqlite);
 
 async function seed() {
   console.log('Seeding database...');
@@ -163,7 +159,6 @@ The ice caves under Vatnajökull were the highlight — blue light so deep and c
   ]);
 
   console.log('✓ Seeded 3 trips with stays, activities, and 10 placeholder photos');
-  sqlite.close();
 }
 
 seed().catch((err) => {

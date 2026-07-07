@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { db } from '@/lib/db';
 import { trips, photos } from '@/lib/db/schema';
 import { eq, count, countDistinct, min, max } from 'drizzle-orm';
